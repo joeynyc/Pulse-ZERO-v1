@@ -1,34 +1,115 @@
-# Pulse Messaging
+# Pulse
 
-Pulse is a peer-to-peer iOS messaging app that explores local discovery and resilient communication without relying on centralized servers. The project focuses on privacy, reliability, and a clean, minimal user experience.
+**Decentralized messaging for iOS.**
 
-## Purpose
+A high-performance iOS messaging engine written 100% in **Swift**. Pulse facilitates peer-to-peer, decentralized communication without reliance on centralized servers. Built for the 2026 iOS ecosystem with secure key management, mesh networking, and real-time data streaming via open relays.
 
-Build a fast, local-first messenger that can operate in constrained networks while keeping user data under user control.
+> No servers. No silos. Just Pulse.
 
-## Journey
+---
 
-This repository captures the full build of Pulse: from architecture exploration to security audits and reliability improvements. It documents the trade-offs, the fixes we made, and the practical lessons learned while getting a real device-first experience to feel dependable.
+## 💡 The Vision
 
-If you want the deeper technical walkthroughs, see:
-- `PULSE_iOS26_ARCHITECTURE.md`
-- `PULSE_AUDIT_REPORT.md`
-- `IMPROVEMENTS_SUMMARY.md`
+Pulse is inspired by **Bitchat** and the broader **Nostr** ecosystem—protocols championed by Jack Dorsey and the open-source community. The goal is to move away from "platforms" and toward "protocols," ensuring that your identity and your conversations remain yours, regardless of who owns the network.
 
-## Features
+This isn't just an app; it's a step toward sovereign communication—private, censorship-resistant, and entirely user-owned.
 
-- Nearby peer discovery and mesh-style messaging
-- End-to-end encryption with message signing and verification
-- Resilient delivery with acknowledgements and deduplication
-- Privacy controls for link previews and discovery profile sharing
+---
 
-## Getting Started
+## ✨ Features
 
-1. Open `Pulse/Pulse.xcodeproj` in Xcode.
-2. Select an iOS 26 simulator (or device) and run the `Pulse` scheme.
-3. Use `PulseTests` to run the test suite.
+| Category | What Pulse Does |
+|----------|-----------------|
+| **Mesh Discovery** | Nearby peer detection via Bluetooth LE and MultipeerConnectivity |
+| **End-to-End Encryption** | All messages encrypted with Curve25519 key exchange |
+| **Message Signing** | Ed25519 signatures verify sender authenticity |
+| **Resilient Delivery** | Acknowledgements, deduplication, and multi-hop routing |
+| **Privacy Controls** | Toggles for link previews, discovery profile sharing, and data retention |
+| **Offline-First** | Local SwiftData persistence; works without internet |
+| **Open Protocol Ready** | Nostr transport layer for relay-based messaging (WIP) |
 
-## Notes
+---
 
-- The test suite expects an iOS 26 simulator; adjust the destination as needed.
-- This repo intentionally avoids any mock data in dev/prod.
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      SwiftUI Views                      │
+├─────────────────────────────────────────────────────────┤
+│  ChatManager  │  MeshManager  │  IdentityManager        │
+├─────────────────────────────────────────────────────────┤
+│         UnifiedTransportManager (Mesh + Nostr)          │
+├─────────────────────────────────────────────────────────┤
+│  MultipeerConnectivity  │  BLE Advertiser  │  WebSocket │
+└─────────────────────────────────────────────────────────┘
+```
+
+- **Managers/** – Business logic (chat, mesh, identity, persistence)
+- **Networking/** – Transport protocols, routing, deduplication
+- **Models/** – Data types (Message, PulsePeer, PulseIdentity)
+- **Views/** – SwiftUI interface with Liquid Glass design
+
+---
+
+## 🚀 Getting Started
+
+1. Clone the repo
+2. Open `Pulse/Pulse.xcodeproj` in Xcode 26+
+3. Select an iOS 26 simulator or device
+4. Run the `Pulse` scheme
+
+```bash
+git clone https://github.com/JesseRod329/Pulse-Messaging-.git
+cd Pulse-Messaging-/Pulse
+open Pulse.xcodeproj
+```
+
+---
+
+## 🧪 Tests
+
+```bash
+xcodebuild -project Pulse.xcodeproj -scheme PulseTests \
+  -sdk iphonesimulator \
+  -destination 'platform=iOS Simulator,OS=26.0,name=iPhone 17' \
+  test
+```
+
+The test suite includes:
+- Identity/crypto tests
+- Mesh simulator with virtual peers
+- Chaos testing for network reliability
+
+---
+
+## 📚 Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [PULSE_iOS26_ARCHITECTURE.md](PULSE_iOS26_ARCHITECTURE.md) | Technical deep-dive into the system design |
+| [PULSE_AUDIT_REPORT.md](PULSE_AUDIT_REPORT.md) | Security audit findings and remediations |
+| [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md) | Changelog of major improvements |
+| [QUICK_START.md](QUICK_START.md) | Fast-track setup guide |
+
+---
+
+## 🙏 Inspiration & Credits
+
+Pulse draws heavily from:
+- **[Nostr](https://nostr.com/)** – The decentralized social protocol
+- **Bitchat** – Jack Dorsey's vision for open, censorship-resistant messaging
+- **[secp256k1](https://github.com/bitcoin-core/secp256k1)** – Elliptic curve cryptography
+
+This project exists because open protocols matter.
+
+---
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ by <a href="https://github.com/JesseRod329">Jesse Rodriguez</a></strong>
+</p>
