@@ -30,6 +30,20 @@ This isn't just an app; it's a step toward sovereign communication—private, ce
 
 ---
 
+## 📸 Screenshots
+
+![Pulse screenshot 1](media/screenshot-1.png)
+![Pulse screenshot 2](media/screenshot-2.png)
+![Pulse screenshot 3](media/screenshot-3.png)
+![Pulse screenshot 4](media/screenshot-4.png)
+![Pulse screenshot 5](media/screenshot-5.png)
+
+## 🎥 Walkthrough
+
+[Watch the walkthrough video](media/walkthrough.mov)
+
+---
+
 ## 🏗️ Architecture
 
 ```
