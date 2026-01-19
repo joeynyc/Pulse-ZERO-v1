@@ -420,6 +420,7 @@ struct ProfileView: View {
                 )
                 .accessibilityLabel("Lightning Address")
                 .accessibilityHint("Enter your Lightning Address to receive zaps")
+                .privacySensitiveIfAvailable()
 
             Text("Your Lightning Address allows others to send you sats via zaps. Supports NIP-57.")
                 .font(.pulseCaption)
@@ -436,6 +437,7 @@ struct ProfileView: View {
                         Text(String(nostrIdentity.npub.prefix(20)) + "...")
                             .font(.caption.monospaced())
                             .foregroundStyle(themeManager.colors.text)
+                            .privacySensitiveIfAvailable()
 
                         Button {
                             // SECURITY: Use ClipboardManager with auto-clear for Nostr public key
@@ -474,6 +476,7 @@ struct ProfileView: View {
                         Text(String(identity.did.prefix(24)) + "...")
                             .font(.caption.monospaced())
                             .foregroundStyle(themeManager.colors.text)
+                            .privacySensitiveIfAvailable()
 
                         Button {
                             // SECURITY: Use ClipboardManager with auto-clear for DID

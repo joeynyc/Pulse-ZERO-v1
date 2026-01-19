@@ -20,6 +20,9 @@ final class LNURLService: ObservableObject {
     /// Secure URLSession with certificate validation
     /// Protects against MITM attacks on Lightning Address resolution
     private let session: URLSession
+    private var requestLimiter = RateLimiter(maxEvents: 5, interval: 1)
+    private let maxRetries = 3
+    private let baseRetryDelay: TimeInterval = 0.4
 
     private init() {
         // Use secure session with certificate validation
@@ -33,6 +36,10 @@ final class LNURLService: ObservableObject {
         isProcessing = true
         lastError = nil
         defer { isProcessing = false }
+
+        guard requestLimiter.shouldAllow() else {
+            throw LNURLServiceError.rateLimited
+        }
 
         // Parse Lightning Address
         let parts = address.split(separator: "@")
@@ -49,7 +56,7 @@ final class LNURLService: ObservableObject {
         }
 
         // Fetch LNURL metadata
-        let (data, response) = try await session.data(from: url)
+        let (data, response) = try await fetchData(from: url)
 
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
@@ -85,6 +92,10 @@ final class LNURLService: ObservableObject {
         isProcessing = true
         lastError = nil
         defer { isProcessing = false }
+
+        guard requestLimiter.shouldAllow() else {
+            throw LNURLServiceError.rateLimited
+        }
 
         // Validate amount
         guard amount >= payResponse.minSendable,
@@ -123,7 +134,7 @@ final class LNURLService: ObservableObject {
         }
 
         // Request invoice
-        let (data, response) = try await session.data(from: callbackURL)
+        let (data, response) = try await fetchData(from: callbackURL)
 
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
@@ -147,7 +158,7 @@ final class LNURLService: ObservableObject {
     func openWallet(invoice: String, preferredWallet: LightningWallet = .automatic) -> Bool {
         // Try preferred wallet first
         if preferredWallet != .automatic,
-           let url = preferredWallet.paymentURL(invoice: invoice),
+           let url = WalletURISanitizer.buildPaymentURL(invoice: invoice, wallet: preferredWallet),
            UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
             return true
@@ -155,7 +166,7 @@ final class LNURLService: ObservableObject {
 
         // Try each wallet in order
         for wallet in LightningWallet.allCases where wallet != .automatic {
-            if let url = wallet.paymentURL(invoice: invoice),
+            if let url = WalletURISanitizer.buildPaymentURL(invoice: invoice, wallet: wallet),
                UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
                 return true
@@ -163,7 +174,7 @@ final class LNURLService: ObservableObject {
         }
 
         // Fall back to generic lightning: scheme
-        if let url = URL(string: "lightning:\(invoice)") {
+        if let url = WalletURISanitizer.buildGenericLightningURL(invoice: invoice) {
             UIApplication.shared.open(url)
             return true
         }
@@ -174,7 +185,7 @@ final class LNURLService: ObservableObject {
     /// Check if any Lightning wallet is installed
     func hasLightningWallet() -> Bool {
         for wallet in LightningWallet.allCases {
-            if let url = wallet.paymentURL(invoice: "lnbc1") {
+            if let url = WalletURISanitizer.buildPaymentURL(invoice: "lnbc1", wallet: wallet) {
                 // Use canOpenURL which requires LSApplicationQueriesSchemes in Info.plist
                 if UIApplication.shared.canOpenURL(url) {
                     return true
@@ -183,7 +194,7 @@ final class LNURLService: ObservableObject {
         }
 
         // Check generic lightning: scheme
-        if let url = URL(string: "lightning:lnbc1") {
+        if let url = WalletURISanitizer.buildGenericLightningURL(invoice: "lnbc1") {
             return UIApplication.shared.canOpenURL(url)
         }
 
@@ -208,6 +219,43 @@ final class LNURLService: ObservableObject {
         }
         return String(data: data, encoding: .utf8)
     }
+
+    // MARK: - Network Defense Helpers
+
+    private func fetchData(from url: URL) async throws -> (Data, HTTPURLResponse) {
+        var lastError: Error?
+
+        for attempt in 0...maxRetries {
+            try Task.checkCancellation()
+
+            do {
+                let (data, response) = try await session.data(from: url)
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw LNURLServiceError.serverError
+                }
+
+                if (500...599).contains(httpResponse.statusCode), attempt < maxRetries {
+                    lastError = LNURLServiceError.serverError
+                } else {
+                    return (data, httpResponse)
+                }
+            } catch {
+                lastError = error
+            }
+
+            guard attempt < maxRetries else { break }
+            let delay = backoffDelay(for: attempt)
+            try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        }
+
+        throw lastError ?? LNURLServiceError.serverError
+    }
+
+    private func backoffDelay(for attempt: Int) -> TimeInterval {
+        let exponential = baseRetryDelay * pow(2.0, Double(attempt))
+        let jitter = Double.random(in: 0...0.2)
+        return exponential + jitter
+    }
 }
 
 // MARK: - Errors
@@ -217,6 +265,7 @@ enum LNURLServiceError: Error, LocalizedError {
     case invalidResponse
     case invalidCallback
     case serverError
+    case rateLimited
     case amountOutOfRange(min: Int, max: Int)
     case noWalletInstalled
     case zapNotSupported
@@ -231,6 +280,8 @@ enum LNURLServiceError: Error, LocalizedError {
             return "Invalid callback URL"
         case .serverError:
             return "Lightning server error"
+        case .rateLimited:
+            return "Too many Lightning requests. Please try again shortly."
         case .amountOutOfRange(let min, let max):
             return "Amount must be between \(min) and \(max) sats"
         case .noWalletInstalled:
