@@ -65,7 +65,9 @@ class MeshManager: NSObject, ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.refreshAdvertising()
+            Task { @MainActor in
+                self?.refreshAdvertising()
+            }
         }
 
         NotificationCenter.default.addObserver(
@@ -73,8 +75,10 @@ class MeshManager: NSObject, ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            guard self?.isAdvertising == true else { return }
-            self?.refreshAdvertising()
+            Task { @MainActor in
+                guard self?.isAdvertising == true else { return }
+                self?.refreshAdvertising()
+            }
         }
     }
     
@@ -455,21 +459,6 @@ class MeshManager: NSObject, ObservableObject {
         
         let content = responses.randomElement() ?? "Hello!"
         
-        // We need to encrypt this to make it look real, or just inject it directly into receivedMessages as if decrypted?
-        // IdentityManager expects encrypted content to decrypt.
-        // For simplicity in demo, we can just inject a "decrypted" message structure if we modify how received messages are processed,
-        // OR we can actually encrypt it using our public key (since we are "sending" to ourselves effectively in this sim).
-        
-        // Actually, easiest is to construct a MessageEnvelope and pretend it came in.
-        // But the `session(_:didReceive:fromPeer:)` decodes and then appends.
-        // `ChatManager` does the decryption.
-        
-        // To make this work end-to-end with ChatManager's decryption:
-        // 1. Get MY public key.
-        // 2. Encrypt the content using MY public key (as if the sender used it).
-        // 3. Create envelope.
-        // 4. Post .didReceiveMessage or call receivedMessages.append.
-        
         guard let myPublicKey = IdentityManager.shared.myPublicKey else { return }
         
         // Create a temporary identity for the sender to encrypt FROM
@@ -518,10 +507,50 @@ class MeshManager: NSObject, ObservableObject {
         let sign4 = Curve25519.Signing.PrivateKey().publicKey.rawRepresentation
 
         nearbyPeers = [
-            PulsePeer(id: "1", handle: "@jesse_codes", status: .active, techStack: ["Swift", "Rust"], distance: 8, publicKey: key1, signingPublicKey: sign1),
-            PulsePeer(id: "2", handle: "@swift_sarah", status: .active, techStack: ["Swift", "iOS"], distance: 15, publicKey: key2, signingPublicKey: sign2),
-            PulsePeer(id: "3", handle: "@rust_dev", status: .flowState, techStack: ["Rust", "WebAssembly"], distance: 45, publicKey: key3, signingPublicKey: sign3),
-            PulsePeer(id: "4", handle: "@pythonista", status: .idle, techStack: ["Python", "ML"], distance: 80, publicKey: key4, signingPublicKey: sign4)
+            PulsePeer(
+                id: "1", 
+                handle: "@jesse_codes", 
+                status: .active, 
+                techStack: ["Swift", "Rust"], 
+                distance: 8, 
+                publicKey: key1, 
+                signingPublicKey: sign1,
+                lightningAddress: "jesse@getalby.com",
+                nostrPubkey: "854c7c6b8ac71f0d545a7d6c3bbfd5f2d6476df7f0a3a735d60d2e0b0a2d3c4e"
+            ),
+            PulsePeer(
+                id: "2", 
+                handle: "@swift_sarah", 
+                status: .active, 
+                techStack: ["Swift", "iOS"], 
+                distance: 15, 
+                publicKey: key2, 
+                signingPublicKey: sign2,
+                lightningAddress: "sarah@walletofsatoshi.com",
+                nostrPubkey: "f5a8c7e9b3d1f7e6c2a8d4b6e9f1c3a5d7e8b2c4f6a9d1e3b5c7f8a2d4e6b9"
+            ),
+            PulsePeer(
+                id: "3", 
+                handle: "@rust_dev", 
+                status: .flowState, 
+                techStack: ["Rust", "WebAssembly"], 
+                distance: 45, 
+                publicKey: key3, 
+                signingPublicKey: sign3,
+                lightningAddress: "rustdev@bitrefill.com",
+                nostrPubkey: "c7e9b3d1f7e6c2a8d4b6e9f1c3a5d7e8b2c4f6a9d1e3b5c7f8a2d4e6b9f5a8"
+            ),
+            PulsePeer(
+                id: "4", 
+                handle: "@pythonista", 
+                status: .idle, 
+                techStack: ["Python", "ML"], 
+                distance: 80, 
+                publicKey: key4, 
+                signingPublicKey: sign4,
+                lightningAddress: "python@zebedee.io",
+                nostrPubkey: "b3d1f7e6c2a8d4b6e9f1c3a5d7e8b2c4f6a9d1e3b5c7f8a2d4e6b9f5a8c7e9"
+            )
         ]
     }
 }
@@ -718,7 +747,7 @@ extension MeshManager: MCSessionDelegate {
         guard let payloadData = try? JSONEncoder().encode(payload) else { return }
 
         // Use MessageEnvelope with type "handshake" and payload as content
-        var envelope = MessageEnvelope(
+        let envelope = MessageEnvelope(
             id: UUID().uuidString,
             senderId: myPeerID.displayName,
             recipientId: peerID.displayName,

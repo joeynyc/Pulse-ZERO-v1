@@ -44,7 +44,11 @@ struct PulseApp: App {
             forTaskWithIdentifier: "com.jesse.pulse-mesh.discovery",
             using: nil
         ) { task in
-            handleBackgroundDiscoveryTask(task as! BGProcessingTask)
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            handleBackgroundDiscoveryTask(processingTask)
         }
 
         // Schedule the background discovery task

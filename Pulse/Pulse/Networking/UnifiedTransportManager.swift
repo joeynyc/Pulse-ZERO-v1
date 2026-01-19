@@ -52,7 +52,9 @@ final class UnifiedTransportManager: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.applyUserDefaultsConfig()
+            Task { @MainActor in
+                self?.applyUserDefaultsConfig()
+            }
         }
     }
 

@@ -83,7 +83,14 @@ final class PersistenceManager {
         do {
             container = try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            print("❌ Failed to create ModelContainer: \(error)")
+            let fallbackConfiguration = ModelConfiguration(isStoredInMemoryOnly: true)
+            do {
+                container = try ModelContainer(for: schema, configurations: [fallbackConfiguration])
+                print("⚠️ Using in-memory SwiftData store as fallback.")
+            } catch {
+                fatalError("Could not create fallback ModelContainer: \(error)")
+            }
         }
     }
 
