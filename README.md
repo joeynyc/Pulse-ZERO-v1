@@ -2,6 +2,8 @@
 
 **Decentralized messaging for iOS.**
 
+![Swift](https://img.shields.io/badge/Swift-5.0-orange) ![Platform](https://img.shields.io/badge/Platform-iOS_26-blue) ![Status](https://img.shields.io/badge/Status-Alpha-yellow) ![License](https://img.shields.io/badge/License-MIT-green)
+
 A high-performance iOS messaging engine written 100% in **Swift**. Pulse facilitates peer-to-peer, decentralized communication without reliance on centralized servers. Built for the 2026 iOS ecosystem with secure key management, mesh networking, and real-time data streaming via Nostr relays.
 
 > No servers. No silos. Just Pulse.
@@ -13,6 +15,12 @@ A high-performance iOS messaging engine written 100% in **Swift**. Pulse facilit
 Pulse ZERO is inspired by **Bitchat** and the broader **Nostr** ecosystem—protocols championed by Jack Dorsey and the open-source community. The goal is to move away from "platforms" and toward "protocols," ensuring that your identity and your conversations remain yours, regardless of who owns the network.
 
 This isn't just an app; it's a step toward sovereign communication—private, censorship-resistant, and entirely user-owned.
+
+---
+
+## How It Works
+
+Pulse uses a **dual-transport system** to deliver messages. When peers are nearby, messages travel directly over **Bluetooth LE and MultipeerConnectivity** — no internet required. For global reach, messages route through **Nostr relays** over WebSocket connections. Both paths are end-to-end encrypted and signature-verified, so your messages stay private regardless of which transport carries them. A unified routing layer handles deduplication, acknowledgements, and multi-hop forwarding automatically.
 
 ---
 
@@ -92,21 +100,18 @@ This isn't just an app; it's a step toward sovereign communication—private, ce
 - **Views/** — SwiftUI interface with Liquid Glass design
 - **Utilities/** — Clipboard security, debug logging, avatar management
 
-### Security Components
-
-| Component | Purpose |
-|-----------|---------|
-| `NostrEventValidator` | Validates event signatures and format |
-| `SecureNetworkSession` | TLS certificate validation |
-| `ClipboardManager` | Auto-clears sensitive clipboard data |
-| `RateLimiter` | Prevents event flooding |
-
 ---
+
+## Requirements
+
+- Xcode 26+
+- iOS 26.0+
+- Swift 5.0
 
 ## Getting Started
 
 1. Clone the repo
-2. Open `Pulse/Pulse.xcodeproj` in Xcode 26+
+2. Open `Pulse/Pulse.xcodeproj` in Xcode
 3. Select an iOS 26 simulator or device
 4. Run the `Pulse` scheme
 
@@ -127,36 +132,9 @@ xcodebuild -project Pulse.xcodeproj -scheme PulseTests \
   test
 ```
 
-### Test Suite
-
-| Test File | Coverage |
-|-----------|----------|
-| `PulseIdentityTests` | Identity creation, encryption, signing |
-| `NostrNormalizationTests` | Deterministic JSON for Nostr events |
-| `NostrEventValidatorTests` | Event signature validation |
-| `SecurityHardeningTests` | Rate limiting |
-| `ProductionSecurityTests` | End-to-end security scenarios |
-| `ErrorManagerTests` | Sensitive string scrubbing |
-| `RateLimiterTests` | Rate limiter window and reset logic |
-| `MeshSimulatorTests` | Virtual peer network testing |
-
----
-
-## Documentation
-
-| Doc | Description |
-|-----|-------------|
-| [PULSE_iOS26_ARCHITECTURE.md](PULSE_iOS26_ARCHITECTURE.md) | Technical deep-dive into the system design |
-| [PULSE_AUDIT_REPORT.md](PULSE_AUDIT_REPORT.md) | Security audit findings and remediations |
-| [IMPROVEMENTS_SUMMARY.md](IMPROVEMENTS_SUMMARY.md) | Changelog of major improvements |
-| [QUICK_START.md](QUICK_START.md) | Fast-track setup guide |
-| [PRIVACY_POLICY.md](Pulse/PRIVACY_POLICY.md) | Privacy policy |
-
 ---
 
 ## Security Model
-
-### Threat Mitigations
 
 | Threat | Mitigation |
 |--------|------------|
@@ -164,13 +142,6 @@ xcodebuild -project Pulse.xcodeproj -scheme PulseTests \
 | MITM Attacks | Certificate validation on all HTTPS/WSS connections |
 | Clipboard Sniffing | Auto-clear after 30s + clear on background |
 | Key Extraction | Keychain with biometric/device-only access |
-
-### Cryptographic Primitives
-
-- **Encryption**: Curve25519 (X25519) key exchange + ChaCha20-Poly1305
-- **Signing**: Ed25519 for mesh messages, secp256k1 Schnorr for Nostr
-- **Hashing**: SHA-256 for event IDs
-- **Key Storage**: iOS Keychain with `.whenUnlockedThisDeviceOnly`
 
 ---
 
@@ -185,6 +156,12 @@ This project exists because open protocols matter.
 
 ---
 
+## Contributing
+
+PRs welcome. Please open an issue first to discuss what you'd like to change.
+
+---
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
@@ -192,5 +169,5 @@ MIT License. See [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <strong>Built with love by <a href="https://github.com/JesseRod329">Jesse Rodriguez</a></strong>
+  <strong>Built by <a href="https://github.com/JesseRod329">Jesse Rodriguez</a> & <a href="https://github.com/joeynyc">Joey Rodriguez</a></strong>
 </p>
