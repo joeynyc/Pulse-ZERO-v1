@@ -51,11 +51,13 @@ This isn't just an app; it's a step toward sovereign communication—private, ce
 
 ## Screenshots
 
-![Pulse screenshot 1](media/screenshot-1.png)
-![Pulse screenshot 2](media/screenshot-2.png)
-![Pulse screenshot 3](media/screenshot-3.png)
-![Pulse screenshot 4](media/screenshot-4.png)
-![Pulse screenshot 5](media/screenshot-5.png)
+<p>
+  <img src="media/screenshot-1.png" width="180" />
+  <img src="media/screenshot-2.png" width="180" />
+  <img src="media/screenshot-3.png" width="180" />
+  <img src="media/screenshot-4.png" width="180" />
+  <img src="media/screenshot-5.png" width="180" />
+</p>
 
 ## Walkthrough
 
