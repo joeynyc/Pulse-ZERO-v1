@@ -162,6 +162,16 @@ PRs welcome. Please open an issue first to discuss what you'd like to change.
 
 ---
 
+## Disclaimer
+
+Pulse ZERO is provided **for educational and lawful use only**. This software is designed for private, peer-to-peer communication over open protocols. Users are solely responsible for ensuring their use of this software complies with all applicable local, state, federal, and international laws. The authors do not condone and are not responsible for any illegal use of this software, including but not limited to unauthorized surveillance, harassment, or distribution of prohibited content.
+
+**This software is provided "as is" without warranty of any kind.** See the [LICENSE](LICENSE) for full terms.
+
+## AI & API Compliance
+
+Development of Pulse ZERO uses AI-assisted tooling (Claude Code by Anthropic). All AI usage complies with [Anthropic's Acceptable Use Policy](https://www.anthropic.com/policies/aup) and [Terms of Service](https://www.anthropic.com/policies/terms). No AI models are embedded in or distributed with this application.
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
