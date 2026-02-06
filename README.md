@@ -107,8 +107,8 @@ This isn't just an app; it's a step toward sovereign communication—private, ce
 4. Run the `Pulse` scheme
 
 ```bash
-git clone https://github.com/joeynyc/Pulse-Messaging.git
-cd Pulse-Messaging/Pulse
+git clone https://github.com/joeynyc/Pulse-ZERO-v1.git
+cd Pulse-ZERO-v1/Pulse
 open Pulse.xcodeproj
 ```
 
