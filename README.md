@@ -4,7 +4,7 @@
 
 ![Swift](https://img.shields.io/badge/Swift-5.0-orange) ![Platform](https://img.shields.io/badge/Platform-iOS_26-blue) ![Status](https://img.shields.io/badge/Status-Alpha-yellow) ![License](https://img.shields.io/badge/License-MIT-green)
 
-A high-performance iOS messaging engine written 100% in **Swift**. Pulse facilitates peer-to-peer, decentralized communication without reliance on centralized servers. Built for the 2026 iOS ecosystem with secure key management, mesh networking, and real-time data streaming via Nostr relays.
+A high-performance iOS messaging engine written 100% in **Swift**. Pulse ZERO facilitates peer-to-peer, decentralized communication without reliance on centralized servers. Built for the 2026 iOS ecosystem with secure key management, mesh networking, and real-time data streaming via Nostr relays.
 
 > No servers. No silos. Just Pulse.
 
@@ -20,7 +20,7 @@ This isn't just an app; it's a step toward sovereign communication—private, ce
 
 ## How It Works
 
-Pulse uses a **dual-transport system** to deliver messages. When peers are nearby, messages travel directly over **Bluetooth LE and MultipeerConnectivity** — no internet required. For global reach, messages route through **Nostr relays** over WebSocket connections. Both paths are end-to-end encrypted and signature-verified, so your messages stay private regardless of which transport carries them. A unified routing layer handles deduplication, acknowledgements, and multi-hop forwarding automatically.
+Pulse ZERO uses a **dual-transport system** to deliver messages. When peers are nearby, messages travel directly over **Bluetooth LE and MultipeerConnectivity** — no internet required. For global reach, messages route through **Nostr relays** over WebSocket connections. Both paths are end-to-end encrypted and signature-verified, so your messages stay private regardless of which transport carries them. A unified routing layer handles deduplication, acknowledgements, and multi-hop forwarding automatically.
 
 ---
 
