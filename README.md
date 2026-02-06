@@ -61,7 +61,9 @@ This isn't just an app; it's a step toward sovereign communication—private, ce
 
 ## Walkthrough
 
-[Watch the walkthrough video](media/walkthrough.mp4)
+![Walkthrough preview](media/walkthrough.gif)
+
+[Watch the full video](media/walkthrough.mp4)
 
 ---
 
